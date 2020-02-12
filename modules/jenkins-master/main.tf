@@ -76,7 +76,7 @@ resource "oci_core_instance" "TFJenkinsMaster" {
 
     inline = [
       "chmod +x ~/setup.sh",
-      "sudo ~/setup.sh",
+      "sudo ~/setup.sh > /tmp/c1output1.txt",
     ]
   }
 

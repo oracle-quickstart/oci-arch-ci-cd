@@ -10,13 +10,13 @@ variable "availability_domain" {
   default="3"
 }
 variable "jenkins_password" {
-  default     = "Admin123!"
+  default     = "Admin123"
 }
 variable "jenkins_version" {
     default     = "2.204.2"
 }
 variable "master_display_name" {
-   default     = "Jenkins-Master"
+   default     = "Jenkins-Master-Node"
 }
 variable "image_ocid" {}
 variable "instance_shape" {}
@@ -26,7 +26,7 @@ variable "http_port" {
 variable "plugins" {  
   type        = "list"
   description = "A list of Jenkins plugins to install, use short names. "
-  default     = ["git", "ssh-slaves", "oracle-cloud-infrastructure-compute"]
+  default     = ["git", "ssh-slaves", "oracle-cloud-infrastructure-compute", "blueocean", "blueocean-github-pipeline"]
   }
 variable "instance_user" {
   default="opc"
