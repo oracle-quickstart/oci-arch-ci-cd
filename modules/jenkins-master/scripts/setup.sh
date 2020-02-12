@@ -1,6 +1,13 @@
 #!/bin/bash
 set -e -x
 
+sudo echo "OCI CLI Install"
+
+printf 'y\n' | sudo yum install python-pip
+sudo pip install oci-cli --upgrade
+
+sleep 10
+
 function waitForJenkins() {
     echo "Waiting for Jenkins to launch on ${http_port}..."
 
@@ -11,24 +18,20 @@ function waitForJenkins() {
     echo "Jenkins launched"
 }
 
-sudo echo "Java + CLI Install"
+sudo echo "Java Install"
 
 # Install Java for Jenkins
-sudo yum -y update
+sudo yum -y update || true
 sudo yum -y install java
-
-sudo echo "CLI Install"
-
-sudo curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh;chmod +x install.sh;./install.sh --accept-all-defaults
 
 sleep 10
 
-# Install xmlstarlet used for XML config manipulation
+# Install xmlstarlet used for XML config manipulation curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh chmod +x install.sh
 sudo yum install -y xmlstarlet
 
 sudo echo "step -> docker install"
 
-sudo yum update -y
+sudo yum -y update || true
 sudo yum install -y java git docker-engine
 sudo systemctl start docker
 sudo systemctl enable docker
