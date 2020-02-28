@@ -107,7 +107,9 @@ Go to OCI console -> Compute -> Instances.
 
 You should be able to see the instance `Jenkins-Instance`
 
-Copy the public-ip of the instance. Open a browser and enter <public-ip-of-the-instance>:8080
+Copy the public-ip of the instance. Open a browser and enter 
+
+`<public-ip-of-the-instance>:8080`
 
 This should give you a Jenkins UI. Login using username as `admin` and password as specified in vars.tf file.
 
