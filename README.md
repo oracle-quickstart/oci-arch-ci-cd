@@ -67,12 +67,16 @@ Once you are logged in, make sure oci-cli is installed using:
 
 `oci -v`
 
-Next, run the command `oci setup config`.
+Next, run the command `oci setup config`
 
 Press `Enter` when prompted for directory name to accept the default.
+
 Enter the details about tenancy OCID, user OCID.
+
 Enter `Y` for `New RSA key pair`. 
+
 Press Enter and accept default options for directories. 
+
 Press Enter when prompted for passphrase so as to leave it blank.
 
 Verify all the files exists by checking in -> `cd /home/opc/.oci` and then `ls`.
@@ -85,7 +89,11 @@ Run `cat config` and make sure all the details about tenancy are correct.
 
 Now, do `cat oci_api_key_public.pem` and copy the contents of the file. 
 
-Login to OCI console, go to your profile and then your username. Click on `Add Public Key` and copy paste the contents of the file copied in last step. Now make sure the `fingerprint` generated and is same as the one in Jenkins Instance `/home/opc/.oci/config` file. 
+Login to OCI console, go to your profile and then your username. 
+
+Click on `Add Public Key` and copy paste the contents of the file copied in last step. 
+
+Now make sure the `fingerprint` is generated and also it is same as the one in Jenkins Instance `/home/opc/.oci/config` file. 
 
 Next, to add sudo user to Jenkins Server, on Jenkins Instance, do
 
@@ -121,14 +129,15 @@ Click on 'a separate configuration page'. Now, under drop down select 'Add a new
 New dialog box will appear.
 
 Enter 'Name: <Use easy to remember name>'. 
-Next to 'Credentials' click on 'Add' and from the dropdown select 'Jenkins'.
+Next to 'Credentials', click on 'Add' and from the dropdown select 'Jenkins'.
 
-This opens up a dialog box. Keep the `Domain` as it is. 
-For Kind, Choose `Oracle Cloud Infrastructure Credentials`.
+This opens up a dialog box. Keep the 'Domain' as it is. 
+For Kind, Choose 'Oracle Cloud Infrastructure Credentials'.
 
 For rest,
 
 Fill out the dialog box:
+
 Name: Use easy to remember name
 Fingerprint: Copy/paste OCI_api_key_fingerprint value from the config file saved in step 1.
 APIKey: Copy/paste oci_api_key.pem file content from the config file saved in step 1.
@@ -136,10 +145,11 @@ PassPhrase: Leave empty
 Tenant Id: Copy/paste Tenant OCID.
 User Id: Copy/paste User OCID.
 Region: Type your region Name (Shown in OCI console window, us-ashburn-1 etc)
+
 Click Test Connection and verify ‘Successful’ message. We have now verified connectivityto OCI via the Jenkins compute node.
 ```
 
-Finally, come down and make sure to click on `Save`.
+Finally, come down and make sure to click on `Save`
 
 ## Step 3: Configure Github webhook
 
@@ -182,16 +192,18 @@ Under that, Click on `Add Github Server` and then again `Github Server` from the
 Enter the details:
 
 Name -> `Specify a name`
+
 API URL -> `https://api.github.com`
+
 Credentials -> Click on `Add button` and then `Jenkins` under the dropdown. This opens a new window. 
 
 Here, change the Kind to `Secret Text`.
 
 Under Secret -> Enter the access token that was generated in the previous step 4. Click on `Add`.
 
-Click on Test connection and it should show `Credentials verified for <user>`. So now our Jenkins can access our repo.
+Click on test connection and it should show `Credentials verified for <user>`. So now our Jenkins can access our repo.
 
-Check right mark on the Manage hooks. 
+Check right mark on the `Manage hooks`
 
 Go down to the bottom and make sure to click on `Save`.
 
@@ -214,12 +226,15 @@ Open both the files and add in details specific to your tenancy.
 For `hello-deploy.sh`, update details for these fields:
 
 `<Region-Prefix-Name>` -> eg: iad.ocir.io (for ashburn region)
+
 `<username>` -> `<your-tenancy-namespace>/oracleidentitycloudservice/<your-oci-user-email-here>` (look for namespace in tenancy details on your OCI console for `<your-tenancy-namespace>`)
+
 `<OCIR-TOKEN>` -> the token we generated in previous step 6
 
 For `hello.yaml`, update:
 
 `<Region-Prefix-Name>` - eg: iad.ocir.io (for ashburn region)
+
 `<your-tenancy-namespace>` -> (look for namespace in tenancy details on your OCI console for `<your-tenancy-namespace>`)
 
 Once updated, lets copy these files into jenkins instance.
@@ -248,7 +263,7 @@ In the `Jenkinsfile`, go to `stage('Push image to OCIR')` and update details rel
 
 ## Step 9: Install Kubectl and configure kube-config on Jenkins
 
-ssh into Jenkins Server instance and install kubectl using below command and verify it's installed.
+ssh into Jenkins Server instance and install and verify kubectl using below single command.
 
 ````
 curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl;chmod +x ./kubectl;sudo mv ./kubectl /usr/local/bin/kubectl;kubectl version --client
@@ -258,7 +273,7 @@ Now, to setup kubeconfig, go to your OCI tenancy. On the left hand side click on
  
 Click on the cluster created by terraform earlier.
 
-On the top, click on `Access Kubeconfig` and run the commands specified inside the jenkins server where you have ssh'ed in. 
+On the top, click on `Access Kubeconfig` and run the commands specified (make sure you are inside the jenkins instance by ssh into it). 
 
 Once done, verify you can access the k8s nodes, by typing:
 
@@ -278,11 +293,13 @@ Next, select your github profile. Search for the repo (`jenkins-helloworld`) you
 
 Hit `Create Pipeline`.
 
-This creates a pipeline and starts the build, test and deploy steps. Once completed (indicated by green tick), you can go back to jenkins server and run below command.
+This creates a pipeline and starts the build, test and deploy steps. Once completed (indicated by green tick), you can go back to jenkins instance and run below command.
 
 `kubectl get services`
 
-You see details of the services running on the nodes in the cluster. For the hello-service load balancer that you just deployed, you will see:
+You see details of the services running on the nodes in the cluster. 
+
+For the hello-service load balancer that you just deployed, you will see:
 the external IP address of the load balancer (for example, 129.146.147.91)
 the port number.
 
