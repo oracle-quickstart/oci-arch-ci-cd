@@ -1,70 +1,55 @@
-# Continuous Integration (CI) and Continuous Deployment (CD)
-A deployable solution for CI/CD using Jenkins on Oracle Cloud Infrastructure.
+# oci-arch-web-ha
 
+Quick delivery of software has become a competitive advantage for companies. The automation of development processes facilitates speed and consistency, which led to the rise of continuous integration (CI) and continuous delivery and deployment (CD) pipelines. Jenkins is a popular product among Oracle Cloud Infrastructure customers that can automate all phases of CI and CD.
 
-## Pre-Requisites
+In this reference architecture, Jenkins is hosted on Oracle Cloud Infrastructure to centralize build automation and scale the deployment by using Oracle Cloud Infrastructure Registry and Container Engine for Kubernetes. GitHub is used to manage source code.
 
-- You need an Oracle cloud account. Sign up here to create a free trial on OCI - [OCI free trial link](https://www.oracle.com/cloud/free/)
+## Terraform Provider for Oracle Cloud Infrastructure
+The OCI Terraform Provider is now available for automatic download through the Terraform Provider Registry. 
+For more information on how to get started view the [documentation](https://www.terraform.io/docs/providers/oci/index.html) 
+and [setup guide](https://www.terraform.io/docs/providers/oci/guides/version-3-upgrade.html).
 
-- Terraform — use the link to download terraform. Choose the operating systems you plan to work on - [Terraform download](https://www.terraform.io/downloads.html)
+* [Documentation](https://www.terraform.io/docs/providers/oci/index.html)
+* [OCI forums](https://cloudcustomerconnect.oracle.com/resources/9c8fa8f96f/summary)
+* [Github issues](https://github.com/terraform-providers/terraform-provider-oci/issues)
+* [Troubleshooting](https://www.terraform.io/docs/providers/oci/guides/guides/troubleshooting.html)
 
-- Follow the steps in the video link to install terrafor - [Install Terraform](https://learn.hashicorp.com/terraform/getting-started/install.html)
+## Clone the Module
+Now, you'll want a local copy of this repo. You can make that with the commands:
 
-(Note that, for linux and mac install steps are similar, except the file to be edited shown in the video link is —> `profile` for linux and `bash_profile` for mac)
+    git clone https://github.com/oracle-quickstart/oci-arch-ci-cd
+    cd oci-arch-ci-cd
+    ls
 
-Verify terraform is installed successfully using below command.
+## Prerequisites
+First off, you'll need to do some pre-deploy setup.  That's all detailed [here](https://github.com/cloud-partners/oci-prerequisites).
 
-`terraform --version`
+Secondly, create a `terraform.tfvars` file and populate with the following information:
 
-## Deploying the solution
+```
+# Authentication
+tenancy_ocid         = "<tenancy_ocid>"
+user_ocid            = "<user_ocid>"
+fingerprint          = "<finger_print>"
+private_key_path     = "<pem_private_key_path>"
 
-### Step 1: Updating the configuration files
+# SSH Keys
+ssh_public_key  = "<public_ssh_key_path>"
 
-This solution uses Terraform to spin up the infrastructure.
+# Region
+region = "<oci_region>"
 
-Go ahead and clone this repo using below command.
+# Compartment
+compartment_ocid = "<compartment_ocid>"
 
-`git clone https://github.com/oracle-quickstart/oci-arch-ci-cd.git`
+````
 
-Once you clone, open in your machine using your favorite editor. (Vim, Sublime, VSCode, Atom etc.)
+Deploy:
 
-In the opened editor, edit the file `env.sh` to fill in the details specific to your account on OCI.
+    terraform init
+    terraform plan
+    terraform apply
 
-#### *** Optional Step ***
-
-In `vars.tf` file, if you would like to change default values provided for terraform variables, please go ahead and update it.
-
-When all the variables are set, you are ready to run the terraform script.
-
-### Step 2: Running the script for infrastructure provisioning
-
-On the terminal or command line, make sure you are inside the working directory. If not, cd into the folder `oci-arch-ci-cd` using below command
-
-`cd oci-arch-ci-cd`
-
-Let’s export all the variables from `env.sh` into current directory.
-
-`source env.sh`
-
-Initialize terraform using below command
-
-`terraform init`
-
-Plan the terraform using below command
-
-`terraform plan`
-
-Apply Terraform using below command
-
-`terraform apply`
-
-It will prompt ***Enter a value***. Type ***yes***
-
-This will start creating the resources on OCI and might take ~30 min to finish the job.
-
-The terraform script creates all the necessery infrastructure components including  Networking, Jenkins server and OKE on OCI.
-
-Once it completes, you should be able to login to OCI and see all the resources provisioned as expected in terraform.
 
 ### Step 3: Configure OCI-CLI and Sudo user on Jenkins Instance
 
@@ -80,20 +65,21 @@ once you are logged in, make sure OCI-CLI is installed using
 
 `oci -v`
 
-Next, enter the command `oci setup config`
+Next, run the command `oci setup config`
 
-Press Enter when prompted for directory name to accept the default. 
+Press `Enter` when prompted for directory name to accept the default.
 Enter the details about tenancy OCID, user OCID.
-Enter `Y` for `New RSA key pair`. Press Enter and accept default options for directories. 
+Enter `Y` for `New RSA key pair`. 
+Press Enter and accept default options for directories. 
 Press Enter when prompted for passphrase so as to leave it blank.
 
 Verify all the files exists by checking in -> `cd /home/opc/.oci` and then `ls`.
 
-Also, do `cat config` and make sure all the details about tenancy are correct.
+Also, run `cat config` and make sure all the details about tenancy are correct.
 
 Now, do `cat oci_api_key_public.pem` and copy the key contents. 
 
-Login to OCI console, go to your profile and user. Click on `Add Public Key` and copy paste the contents of the file copied in last step. Now make sure the `fingerprint` generated is same as the one in Jenkins server `/home/opc/.oci/nfig` file. 
+Login to OCI console, go to your profile and user. Click on `Add Public Key` and copy paste the contents of the file copied in last step. Now make sure the `fingerprint` generated is same as the one in Jenkins server `/home/opc/.oci/config` file. 
 
 Next, to add sudo user to Jenkins Server, on terminal of logged in Jenkins server, do
 
@@ -216,8 +202,8 @@ Once update, lets copy these files into jenkins server.
 
 From your working directory where you have these files stored, copy the files into jenkins server using below commands.
 
-`scp -i <private-key-for-instance> <path-to-working-directory>/hello-deploy.sh opc@<public-ip-of-instance>:/var/lib/jenkins/workspace`
-`scp -i <private-key-for-instance> <path-to-working-directory>/hello.yml opc@<public-ip-of-instance>:/var/lib/jenkins/workspace`
+`scp -i <private-key-for-instance> <path-to-working-directory>/hello-deploy.sh opc@<public-ip-of-instance>:/var/lib/jenkins`
+`scp -i <private-key-for-instance> <path-to-working-directory>/hello.yml opc@<public-ip-of-instance>:/var/lib/jenkins`
 
 ## Step 10: Update Jenkinsfile in Github repo
 
@@ -269,12 +255,16 @@ You should be able to access the application.
 
 Fron now on, any changes you make to the github code, triggers a new build and deploy by jenkins. This completes the CI/CD cycle.
 
-## Step 12: Delete the resources
+## Destroy the Deployment
+When you no longer need the deployment, you can run this command to destroy it:
 
-Finally, if you like to destroy all the created resources, run below command.
+    terraform destroy
 
-`terraform destroy`
+## CI/CD Architecture
 
-It will prompt ***Enter a value***. Type ***yes***
+![](./images/cicd-diagram.png)
 
-This completes the deployment.
+
+## Reference Archirecture
+
+- [Set up a CI/CD pipeline for cloud deployments](https://docs.oracle.com/en/solutions/cicd-pipeline/index.html)
