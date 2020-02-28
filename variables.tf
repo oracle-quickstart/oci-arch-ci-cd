@@ -16,7 +16,7 @@ variable "jenkins_version" {
     default     = "2.204.2"
 }
 variable "master_display_name" {
-   default     = "Jenkins-Master-Node"
+   default     = "Jenkins-Instance"
 }
 variable "image_ocid" {}
 variable "instance_shape" {}

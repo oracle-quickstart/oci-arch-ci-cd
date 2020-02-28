@@ -53,21 +53,21 @@ Deploy:
 
 ## Post-Deployment Setup 
 
-### Step 1: Configure OCI-CLI and Sudo user on Jenkins Instance
+### Step 1: Configure oci-cli and sudo user on Jenkins Instance
 
 Go to OCI console -> Compute -> Instances.
 
-You should be able to see the instance `Jenkins-Master-Node`
+You should be able to see the instance `Jenkins-Instance`
 
-Copy the public-ip of the instance. ssh into the instance using below command
+Copy the public-ip of the instance. Log in to the instance using below command.
 
 `ssh -i <path-to-ssh-private-key> opc@<public-ip-of-jenkins-instance>`
 
-once you are logged in, make sure OCI-CLI is installed using 
+Once you are logged in, make sure oci-cli is installed using:
 
 `oci -v`
 
-Next, run the command `oci setup config`
+Next, run the command `oci setup config`.
 
 Press `Enter` when prompted for directory name to accept the default.
 Enter the details about tenancy OCID, user OCID.
@@ -77,17 +77,21 @@ Press Enter when prompted for passphrase so as to leave it blank.
 
 Verify all the files exists by checking in -> `cd /home/opc/.oci` and then `ls`.
 
-Also, run `cat config` and make sure all the details about tenancy are correct.
+You should see these files.
 
-Now, do `cat oci_api_key_public.pem` and copy the key contents. 
+![](./images/1.png)
 
-Login to OCI console, go to your profile and user. Click on `Add Public Key` and copy paste the contents of the file copied in last step. Now make sure the `fingerprint` generated is same as the one in Jenkins server `/home/opc/.oci/config` file. 
+Run `cat config` and make sure all the details about tenancy are correct.
 
-Next, to add sudo user to Jenkins Server, on terminal of logged in Jenkins server, do
+Now, do `cat oci_api_key_public.pem` and copy the contents of the file. 
+
+Login to OCI console, go to your profile and then your username. Click on `Add Public Key` and copy paste the contents of the file copied in last step. Now make sure the `fingerprint` generated and is same as the one in Jenkins Instance `/home/opc/.oci/config` file. 
+
+Next, to add sudo user to Jenkins Server, on Jenkins Instance, do
 
 `sudo visudo -f /etc/sudoers.d/filename`
 
-Press `i` for insert mode. Now we just need to include the relevant line in our file:
+Press `i` for insert mode. Now we just need to include the line listed below in our file:
 
 `jenkins ALL=(ALL) NOPASSWD: ALL`
 
@@ -97,13 +101,13 @@ Save and Exit from edit mode,
 
 We are done.
 
-### Step 4: Configure OCI tenancy details on Jenkins UI
+### Step 2: Configure OCI tenancy details on Jenkins UI
 
 Go to OCI console -> Compute -> Instances.
 
-You should be able to see the instance `Jenkins-Master-Node`
+You should be able to see the instance `Jenkins-Instance`
 
-Copy the public-ip of the instance. Open a browser and enter <public-ip of the instance>:8080
+Copy the public-ip of the instance. Open a browser and enter <public-ip-of-the-instance>:8080
 
 This should give you a Jenkins UI. Login using username as `admin` and password as specified in vars.tf file.
 
