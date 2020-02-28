@@ -111,10 +111,14 @@ Copy the public-ip of the instance. Open a browser and enter
 
 `<public-ip-of-the-instance>:8080`
 
-This should give you a Jenkins UI. Login using username as `admin` and password as specified in vars.tf file.
+This should give you a Jenkins UI. Login using username as `admin` and password as `Admin123`.
 
 ```WARNING make sure this step is right
-On the Jenkins UI, In Manage Jenkins screen, Click Configure System, Scroll Down and locate `Cloud`. Click on `a separate configuration page. Now, select `drop down arrow under Add a new cloud`. Click `Oracle Cloud Infrastructure Compute`. New dialog box will appear. Enter `Name: <Use easy to remember name>`. Next to `Credentials` click on `Add` and from the dopdown select `Jenkins`.
+On the Jenkins UI, In Manage Jenkins screen on the left, Click Configure System, scroll down and locate `Cloud`.
+
+Click on `a separate configuration page. Now, select `drop down arrow under Add a new cloud`. Click `Oracle Cloud Infrastructure Compute`. 
+
+New dialog box will appear. Enter `Name: <Use easy to remember name>`. Next to `Credentials` click on `Add` and from the dopdown select `Jenkins`.
 
 This opens up a dialog box. Keep the `Domain` as it is. 
 For Kind, Choose `Oracle Cloud Infrastructure Credentials`.
