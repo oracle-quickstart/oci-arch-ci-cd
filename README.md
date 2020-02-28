@@ -53,7 +53,7 @@ Deploy:
 
 ## Post-Deployment Setup 
 
-## Step 1: Configure OCI-CLI and Sudo user on Jenkins Instance
+### Step 1: Configure OCI-CLI and Sudo user on Jenkins Instance
 
 Go to OCI console -> Compute -> Instances.
 
