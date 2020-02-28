@@ -1,4 +1,4 @@
-# oci-arch-web-ha
+# oci-arch-ci-cd
 
 Quick delivery of software has become a competitive advantage for companies. The automation of development processes facilitates speed and consistency, which led to the rise of continuous integration (CI) and continuous delivery and deployment (CD) pipelines. Jenkins is a popular product among Oracle Cloud Infrastructure customers that can automate all phases of CI and CD.
 
@@ -51,7 +51,9 @@ Deploy:
     terraform apply
 
 
-### Step 3: Configure OCI-CLI and Sudo user on Jenkins Instance
+## Post-Deployment Setup 
+
+## Step 1: Configure OCI-CLI and Sudo user on Jenkins Instance
 
 Go to OCI console -> Compute -> Instances.
 
