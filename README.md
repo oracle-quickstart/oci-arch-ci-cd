@@ -1,97 +1,339 @@
-# Continuous Integration (CI) and Continuous Deployment (CD)
-A deployable solution for CI/CD using Jenkins on Oracle Cloud Infrastructure.
+# oci-arch-ci-cd
+
+Quick delivery of software has become a competitive advantage for companies. The automation of development processes facilitates speed and consistency, which led to the rise of continuous integration (CI) and continuous delivery and deployment (CD) pipelines. Jenkins is a popular product among Oracle Cloud Infrastructure customers that can automate all phases of CI and CD.
+
+In this reference architecture, Jenkins is hosted on Oracle Cloud Infrastructure to centralize build automation and scale the deployment by using Oracle Cloud Infrastructure Registry and Container Engine for Kubernetes. GitHub is used to manage source code.
+
+## Terraform Provider for Oracle Cloud Infrastructure
+The OCI Terraform Provider is now available for automatic download through the Terraform Provider Registry. 
+For more information on how to get started view the [documentation](https://www.terraform.io/docs/providers/oci/index.html) 
+and [setup guide](https://www.terraform.io/docs/providers/oci/guides/version-3-upgrade.html).
+
+* [Documentation](https://www.terraform.io/docs/providers/oci/index.html)
+* [OCI forums](https://cloudcustomerconnect.oracle.com/resources/9c8fa8f96f/summary)
+* [Github issues](https://github.com/terraform-providers/terraform-provider-oci/issues)
+* [Troubleshooting](https://www.terraform.io/docs/providers/oci/guides/guides/troubleshooting.html)
+
+## Clone the Module
+Now, you'll want a local copy of this repo. You can make that with the commands:
+
+    git clone https://github.com/oracle-quickstart/oci-arch-ci-cd
+    cd oci-arch-ci-cd
+    ls
+
+## Prerequisites
+First off, you'll need to do some pre-deploy setup.  That's all detailed [here](https://github.com/cloud-partners/oci-prerequisites).
+
+Secondly, create a `terraform.tfvars` file and populate with the following information:
+
+```
+# Authentication
+tenancy_ocid         = "<tenancy_ocid>"
+user_ocid            = "<user_ocid>"
+fingerprint          = "<finger_print>"
+private_key_path     = "<pem_private_key_path>"
+
+# SSH Keys
+ssh_public_key  = "<public_ssh_key_path>"
+
+# Region
+region = "<oci_region>"
+
+# Compartment
+compartment_ocid = "<compartment_ocid>"
+
+````
+
+Deploy:
+
+    terraform init
+    terraform plan
+    terraform apply
 
 
-## Pre-Requisites
+## Post-Deployment Setup 
 
-- You need an Oracle cloud account. Sign up here to create a free trial on OCI - [OCI free trial link](https://www.oracle.com/cloud/free/)
+### Step 1: Configure oci-cli and sudo user on jenkins instance
 
-- Terraform — use the link to download terraform. Choose the operating systems you plan to work on - [Terraform download](https://www.terraform.io/downloads.html)
+Go to OCI console -> Compute -> Instances.
 
-- Follow the steps in the video link to install terrafor - [Install Terraform](https://learn.hashicorp.com/terraform/getting-started/install.html)
+You should be able to see the instance `jenkins-instance`
 
-(Note that, for linux and mac install steps are similar, except the file to be edited shown in the video link is —> `profile` for linux and `bash_profile` for mac)
+Copy the public-ip of the instance. Log in to the instance using below command.
 
-Verify terraform is installed successfully using below command.
+`ssh -i <path-to-ssh-private-key> opc@<public-ip-of-jenkins-instance>`
 
-`terraform --version`
+Once you are logged in, make sure oci-cli is installed using:
 
-## Deploying the solution
+`oci -v`
 
-### Step 1: Updating the configuration files
+Next, run the command `oci setup config`
 
-This solution uses Terraform to spin up the infrastructure.
+Press `Enter` when prompted for a location for config file.
 
-Go ahead and clone this repo using below command.
+Press `Enter` when prompted for directory name to accept the default.
 
-`git clone https://github.com/oracle-quickstart/oci-arch-ci-cd.git`
+Enter the details about user OCID, tenancy OCID and region.
 
-Once you clone, open in your machine using your favorite editor. (Vim, Sublime, VSCode, Atom etc.)
+Enter `Y` for `New RSA key pair`. 
 
-In the opened editor, edit the file `env.sh` to fill in the details specific to your account on OCI.
+Press Enter and accept default options for directories for keys and name for the keys. 
 
-#### *** Optional Step ***
+Press Enter when prompted for passphrase so as to leave it blank.
 
-In `vars.tf` file, if you would like to change default values provided for terraform variables, please go ahead and update it.
+Verify all the files exists by checking in -> `cd /home/opc/.oci` and then `ls`.
 
-When all the variables are set, you are ready to run the terraform script.
+You should see these files.
 
-### Step 2: Running the script for infrastructure provisioning
+![](./images/1.png)
 
-On the terminal or command line, make sure you are inside the working directory. If not, cd into the folder `oci-arch-ci-cd` using below command
+Run `cat config` and make sure all the details about tenancy are correct.
 
-`cd oci-arch-ci-cd`
+Now, do `cat oci_api_key_public.pem` and copy the contents of the file. 
 
-Let’s export all the variables from `env.sh` into current directory.
+Login to OCI console, go to your profile and then your username. 
 
-`source env.sh`
+Click on `Add Public Key` and paste the contents of the file copied in last step. 
 
-Initialize terraform using below command
+Make sure the `fingerprint` is generated and also check it is same as the one in Jenkins Instance `/home/opc/.oci/config` file. 
 
-`terraform init`
+Next, to add sudo user to Jenkins Server, on Jenkins Instance, do
 
-Plan the terraform using below command
+`sudo visudo -f /etc/sudoers.d/filename`
 
-`terraform plan`
+Press `i` for insert mode. Now we just need to include the line listed below in our file:
 
-Apply Terraform using below command
+`jenkins ALL=(ALL) NOPASSWD: ALL`
 
-`terraform apply`
+Save and Exit from edit mode,
 
-It will prompt ***Enter a value***. Type ***yes***
+`Press ESC and type :wq! and hit Enter`. You should be out of the edit mode.
 
-This will start creating the resources on OCI and might take ~30 min to finish the job.
+We are done.
 
-The terraform script creates all the necessery infrastructure components including  Networking, Jenkins server and OKE on OCI.
+### Step 2: Configure OCI tenancy details on Jenkins UI
 
-Once it completes, you should be able to login to OCI and see all the resources provisioned as expected in terraform.
+Go to OCI console -> Compute -> Instances.
 
-### Step 2: Installing OCI-CLI on Jenkins Server
+You should be able to see the instance `jenkins-instance`
 
-To install OCI-CLI on Jenkins, login to jenkins server that was created in the above step.
+Copy the public-ip of the instance. Open a browser and enter 
 
-`ssh -i <private-key> opc@<public-ip-of-jenkins-instance>`
+`<public-ip-of-the-instance>:8080`
+
+This should give you a Jenkins UI. Login using username as `admin` and password as `Admin123`.
+
+```WARNING make sure this step is right
+On the Jenkins UI, In Manage Jenkins screen on the left, Click Configure System, scroll down and locate `Cloud`.
+
+Click on 'Add a new cloud'. Now, under drop down select 'Oracle Cloud Infrastructure Compute'. 
+
+New dialog box will appear.
+
+Enter 'Name: <Use easy to remember name>'. 
+Next to 'Credentials', click on 'Add' and from the dropdown select 'Jenkins'.
+
+This opens up a dialog box. Keep the 'Domain' as it is. 
+For Kind, Choose 'Oracle Cloud Infrastructure Credentials'.
+
+For rest, Fill out the dialog box:
+
+Name: Use easy to remember name
+Fingerprint: Copy/paste OCI_api_key_fingerprint value from the config file saved in step 1.
+APIKey: Copy/paste oci_api_key.pem file content saved in /home/opc/.oci folder in step 1.
+PassPhrase: Leave empty
+Tenant Id: Copy/paste Tenant OCID.
+User Id: Copy/paste User OCID.
+ID: Leave empty
+Description: Leave empty
+Region: Type your region Name (Shown in OCI console window, us-ashburn-1 etc)
+
+Click Verify Credentials and make sure for ‘Successful’ message. We have now verified connectivity to OCI via the Jenkins compute node.
+
+Click on Add.
+```
+
+Finally, come down and make sure to click on `Save`
+
+## Step 3: Configure Github webhook
+
+Go to the repo https://github.com/KartikShrikantHegde/jenkins-helloworld. Fork it. 
+
+On the right side, Go to `Settings`. Then on the left, click on `Webhooks`. 
+
+You should see an option to `Add webhook`. click on it. 
+
+For `Payload URL` enter -> `http://<public-ip-of-the-instance>:8080/github-webhook/`
+
+For `Content type`, choose -> `application/json`
+
+Leave the secret field blank.
+
+select `send me everything` for the field For `Which events would you like to trigger this webhook`
+
+Add webhook and you are done.
+
+## Step 4: Generate Github token
+
+Now click on your github account profile, and click on Settings.
+
+On the left side, you will see an option `Developer settings`. Click on it.
+
+Again on the left, click on `Personal access tokens`. Click `Generate new token`.
+
+Enter a note, select all the options under `Select scopes` and click on `Generate token` at the bottom.
+
+This will generate a one time token. Copy and save it for future steps.
+
+## Step 5: Add the Github token to Jenkins UI
+
+On the Jenkins UI, In Manage Jenkins option on the left , Click Configure System.
+
+Scroll down a bit and you will see `GitHub` section.
+
+Under that, Click on `Add Github Server` and then again `Github Server` from the dropdown. This opens up a window.
+
+Enter the details:
+
+Name -> `Specify a name`
+
+API URL -> leave the default url as it is.
+
+Credentials -> Click on `Add` button and then `Jenkins` under the dropdown. This opens a new window. 
+
+Here, change the Kind to `Secret Text`.
+
+Under Secret -> Enter the access token that was generated in the previous step 4. Leave rest of the fields blank.
+
+Under Credentials, change option from none to `Secret text`.
+
+Click on Test connection and it should show `Credentials verified for <user>`. So now our Jenkins can access our repo.
+
+Check right mark on the `Manage hooks`
+
+Go down to the bottom and make sure to click on `Save`.
+
+## Step 6: Generate OCIR token
+
+Login to OCI console.
+
+Click on your `Profile` -> `User Settings`. On the bottom left, click on `Auth Tokens`. 
+
+Click on `Generate Token`.
+
+Provide a discription and then hit `Generate Token`. This will generate a token. Make sure to copy the token for future steps.
+
+## Step 7: Update deployment files and copy to jenkins instance
+
+In your local working directory, you should be able to see 2 files `hello-deploy.sh` and `hello.yaml` along with other terraform files.
+
+Open both the files and add in details specific to your tenancy.
+
+For `hello-deploy.sh`, update details for these fields:
+
+`<region-prefix-name>` -> eg: iad.ocir.io (for ashburn region)
+
+`<username>` -> `<your-tenancy-namespace>/oracleidentitycloudservice/<your-oci-user-email-here>` (look for namespace in tenancy details on your OCI console for `<your-tenancy-namespace>`)
+
+`<ocir-token>` -> the token we generated in previous step 6
+
+For `hello.yaml`, update:
+
+`<region-prefix-name>` - eg: iad.ocir.io (for ashburn region)
+
+`<your-tenancy-namespace>` -> (look for namespace in tenancy details on your OCI console for `<your-tenancy-namespace>`)
+
+Once updated, lets copy these files into jenkins instance.
+
+From your local working directory where you have these files stored, copy the files into jenkins server using below commands.
+
+`scp -i <path-to-ssh-private-key> hello-deploy.sh opc@<public-ip-of-jenkins-instance>:/home/opc`
+
+`scp -i <path-to-ssh-private-key> hello.yml opc@<public-ip-of-jenkins-instance>:/home/opc`
+
+Now, login to your instance -> `ssh -i <path-to-ssh-private-key> opc@<public-ip-of-jenkins-instance>`
+
+Finally, copy both `hello-deploy.sh` and `hello.yml` to /var/lib/jenkins as:
+
+`sudo cp hello.yml /var/lib/jenkins`
+`sudo cp hello-deploy.sh /var/lib/jenkins`
+
+## Step 8: Update Jenkinsfile in Github repo
+
+Go to the forked Github repo from https://github.com/KartikShrikantHegde/jenkins-helloworld.
+
+Next, in the repo, you should be able to find `Jenkinsfile`. Let's update the `Jenkinsfile`.
+
+In the `Jenkinsfile`, go to `stage('Push image to OCIR')` and update details related to your tenancy:
+
+`<username>` -> `<your-tenancy-namespace>/oracleidentitycloudservice/<your-oci-user-email-here>` (look for namespace in tenancy details on your OCI console for `<your-tenancy-namespace>`)
+
+`<ocir-token>` -> the token we generated in previous step 6
+
+`<region-prefix-name>` -> eg: iad.ocir.io (for ashburn region)
+
+`<your-tenancy-namespace>` -> (look for namespace in tenancy details on your OCI console for `<your-tenancy-namespace>`)
+
+Edit all the details and save the file.
+
+## Step 9: Install kubectl and configure kube-config on Jenkins
+
+ssh into jenkins instance and install and verify kubectl using below single command.
+
+````
+curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl;chmod +x ./kubectl;sudo mv ./kubectl /usr/local/bin/kubectl;kubectl version --client
+````
+
+Now, to setup kubeconfig, go to your OCI tenancy. On the left hand side click on `Developer Services`. Select `Container Clusters (OKE)`. 
+ 
+Click on the cluster created by terraform earlier.
+
+On the top, click on `Access Kubeconfig` and run the commands specified (make sure you are inside the jenkins instance to run the commands). 
+
+Once done, verify you can access the k8s nodes, by typing:
+
+`kubectl get nodes`
+
+You see details of the nodes running in the cluster. 
+
+## Step 10: Create pipeline using Blue Ocean
+
+Finally, with all the configurations done, lets create the pipeline.
+
+On the Jenkins UI,(refer step 2 on how to access Jenkins UI), on the left hand side, you should see `Open Blue Ocean`. Click on it. It opens a new page.
+
+Select `Create a new Pipeline`. Next select `GitHub`. If it asks for a token provide the Github token we generated in `step 4`. 
+
+Next, select your github profile. Search for the repo (`jenkins-helloworld`) you had forked and made the changes. 
+
+Hit `Create Pipeline`.
+
+This creates a pipeline and starts the build, test and deploy steps. Once completed (indicated by green tick), you can go back to jenkins instance and run below command.
+
+`kubectl get services`
+
+You see details of the services running on the nodes in the cluster. 
+
+For the hello-service load balancer that you just deployed, you will see:
+the external IP address of the load balancer (for example, 129.146.147.91)
+the port number.
+
+Open a new browser window and enter the url to access the hello application in the browser's URL field. For example, http://129.146.147.91
+
+You should be able to access the application.
+
+Fron now on, any changes you make to the github code, triggers a new build and deploy by jenkins. This completes the CI/CD cycle.
+
+## Destroy the Deployment
+When you no longer need the deployment, you can run this command to destroy it:
+
+    terraform destroy
+
+## CI/CD Architecture
+
+![](./images/cicd-diagram.png)
 
 
+## Reference Archirecture
 
-## Testing
-
-Go to created resource load balancer and grab it’s public IP.
-
-Open up your favorite browser (Chrome, Firefox etc.) and type `http://<public_ip>/api/`
-
-You should be able to see a web page displayed that fetches the data from Oracle database.
-
-Now, to check if its highly available, go ahead and delete one of the compute instances. Since we have a load balancer deployed, we should still be able to get the response from another running compute instance.
-
-Let’s test it again on the browser. On the browser type `http://<public_ip>/api/`
-
-You should still be able to get a response displaying the same web page you saw earlier. This suggest that our app is highly available even in case of the failure of the other instance. If you were to delete both the instances you should get an error on browser which means our app is no longer available.
-
-Finally, if you like to destroy all the created resources, run below command.
-
-`terraform destroy`
-
-It will prompt ***Enter a value***. Type ***yes***
-
-This completes the deployment.
+- [Set up a CI/CD pipeline for cloud deployments](https://docs.oracle.com/en/solutions/cicd-pipeline/index.html)
