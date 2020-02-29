@@ -1,3 +1,6 @@
+## Copyright © 2020, Oracle and/or its affiliates. 
+## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -15,12 +18,12 @@ spec:
       containers:
         - name: hello
           # enter the path to your image, be sure to include the correct region prefix
-          image: <Region-Prefix-Name>/<your-tenancy-namespace>/customapp:custom>
+          image: <region-prefix-name>/<your-tenancy-namespace>/customapp:custom
           ports:
             - containerPort: 80
       imagePullSecrets:
         # enter the name of the secret you created
-        - name: newsecret
+        - name: secret
 ---
 apiVersion: v1
 kind: Service

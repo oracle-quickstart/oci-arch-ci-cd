@@ -57,7 +57,7 @@ Deploy:
 
 Go to OCI console -> Compute -> Instances.
 
-You should be able to see the instance `Jenkins-Instance`
+You should be able to see the instance `jenkins-instance`
 
 Copy the public-ip of the instance. Log in to the instance using below command.
 
@@ -69,13 +69,15 @@ Once you are logged in, make sure oci-cli is installed using:
 
 Next, run the command `oci setup config`
 
+Press `Enter` when prompted for a location for config file.
+
 Press `Enter` when prompted for directory name to accept the default.
 
-Enter the details about tenancy OCID, user OCID.
+Enter the details about user OCID, tenancy OCID and region.
 
 Enter `Y` for `New RSA key pair`. 
 
-Press Enter and accept default options for directories. 
+Press Enter and accept default options for directories for keys and name for the keys. 
 
 Press Enter when prompted for passphrase so as to leave it blank.
 
@@ -91,9 +93,9 @@ Now, do `cat oci_api_key_public.pem` and copy the contents of the file.
 
 Login to OCI console, go to your profile and then your username. 
 
-Click on `Add Public Key` and copy paste the contents of the file copied in last step. 
+Click on `Add Public Key` and paste the contents of the file copied in last step. 
 
-Now make sure the `fingerprint` is generated and also it is same as the one in Jenkins Instance `/home/opc/.oci/config` file. 
+Make sure the `fingerprint` is generated and also check it is same as the one in Jenkins Instance `/home/opc/.oci/config` file. 
 
 Next, to add sudo user to Jenkins Server, on Jenkins Instance, do
 
@@ -105,7 +107,7 @@ Press `i` for insert mode. Now we just need to include the line listed below in 
 
 Save and Exit from edit mode,
 
-`Press ESC and type :wq and hit Enter`. You should be out of the edit mode.
+`Press ESC and type :wq! and hit Enter`. You should be out of the edit mode.
 
 We are done.
 
@@ -113,7 +115,7 @@ We are done.
 
 Go to OCI console -> Compute -> Instances.
 
-You should be able to see the instance `Jenkins-Instance`
+You should be able to see the instance `jenkins-instance`
 
 Copy the public-ip of the instance. Open a browser and enter 
 
@@ -124,7 +126,7 @@ This should give you a Jenkins UI. Login using username as `admin` and password 
 ```WARNING make sure this step is right
 On the Jenkins UI, In Manage Jenkins screen on the left, Click Configure System, scroll down and locate `Cloud`.
 
-Click on 'a separate configuration page'. Now, under drop down select 'Add a new cloud'. Click 'Oracle Cloud Infrastructure Compute'. 
+Click on 'Add a new cloud'. Now, under drop down select 'Oracle Cloud Infrastructure Compute'. 
 
 New dialog box will appear.
 
@@ -134,19 +136,21 @@ Next to 'Credentials', click on 'Add' and from the dropdown select 'Jenkins'.
 This opens up a dialog box. Keep the 'Domain' as it is. 
 For Kind, Choose 'Oracle Cloud Infrastructure Credentials'.
 
-For rest,
-
-Fill out the dialog box:
+For rest, Fill out the dialog box:
 
 Name: Use easy to remember name
 Fingerprint: Copy/paste OCI_api_key_fingerprint value from the config file saved in step 1.
-APIKey: Copy/paste oci_api_key.pem file content from the config file saved in step 1.
+APIKey: Copy/paste oci_api_key.pem file content saved in /home/opc/.oci folder in step 1.
 PassPhrase: Leave empty
 Tenant Id: Copy/paste Tenant OCID.
 User Id: Copy/paste User OCID.
+ID: Leave empty
+Description: Leave empty
 Region: Type your region Name (Shown in OCI console window, us-ashburn-1 etc)
 
-Click Test Connection and verify ‘Successful’ message. We have now verified connectivityto OCI via the Jenkins compute node.
+Click Verify Credentials and make sure for ‘Successful’ message. We have now verified connectivity to OCI via the Jenkins compute node.
+
+Click on Add.
 ```
 
 Finally, come down and make sure to click on `Save`
@@ -155,23 +159,23 @@ Finally, come down and make sure to click on `Save`
 
 Go to the repo https://github.com/KartikShrikantHegde/jenkins-helloworld. Fork it. 
 
-On the right side, Go to `settings`. Then on the left, click on `webhooks`. 
+On the right side, Go to `Settings`. Then on the left, click on `Webhooks`. 
 
-You should see an option to add webhook. click on it. 
+You should see an option to `Add webhook`. click on it. 
 
-For payload URL enter -> `http://<public-ip-of-the-instance>:8080/github-webhook/`
+For `Payload URL` enter -> `http://<public-ip-of-the-instance>:8080/github-webhook/`
 
-For content type, choose -> `application/json`
+For `Content type`, choose -> `application/json`
 
 Leave the secret field blank.
 
-select `send me everything` for the field `For Which events would you like to trigger this webhook`
+select `send me everything` for the field For `Which events would you like to trigger this webhook`
 
 Add webhook and you are done.
 
 ## Step 4: Generate github token
 
-Now click on your github account profile, and click on settings.
+Now click on your github account profile, and click on Settings.
 
 On the left side, you will see an option `Developer settings`. Click on it.
 
@@ -183,9 +187,9 @@ This will generate a one time token. Copy and save it for future steps.
 
 ## Step 5: Add the github token to Jenkins UI
 
-On the Jenkins UI, In Manage Jenkins screen on the left , Click Configure System.
+On the Jenkins UI, In Manage Jenkins option on the left , Click Configure System.
 
-Scroll Down a bit and you will see `GitHub` section.
+Scroll down a bit and you will see `GitHub` section.
 
 Under that, Click on `Add Github Server` and then again `Github Server` from the dropdown. This opens up a window.
 
@@ -193,15 +197,17 @@ Enter the details:
 
 Name -> `Specify a name`
 
-API URL -> `https://api.github.com`
+API URL -> leave the default url as it is.
 
-Credentials -> Click on `Add button` and then `Jenkins` under the dropdown. This opens a new window. 
+Credentials -> Click on `Add` button and then `Jenkins` under the dropdown. This opens a new window. 
 
 Here, change the Kind to `Secret Text`.
 
-Under Secret -> Enter the access token that was generated in the previous step 4. Click on `Add`.
+Under Secret -> Enter the access token that was generated in the previous step 4. Leave rest of the fields blank.
 
-Click on test connection and it should show `Credentials verified for <user>`. So now our Jenkins can access our repo.
+Under Credentials, change option from none to `Secret text`.
+
+Click on Test connection and it should show `Credentials verified for <user>`. So now our Jenkins can access our repo.
 
 Check right mark on the `Manage hooks`
 
@@ -211,7 +217,7 @@ Go down to the bottom and make sure to click on `Save`.
 
 Login to OCI console.
 
-Click on your `profile` -> `User Settings`. On the bottom left, click on `Auth Tokens`. 
+Click on your `Profile` -> `User Settings`. On the bottom left, click on `Auth Tokens`. 
 
 Click on `Generate Token`.
 
@@ -225,15 +231,15 @@ Open both the files and add in details specific to your tenancy.
 
 For `hello-deploy.sh`, update details for these fields:
 
-`<Region-Prefix-Name>` -> eg: iad.ocir.io (for ashburn region)
+`<region-prefix-name>` -> eg: iad.ocir.io (for ashburn region)
 
 `<username>` -> `<your-tenancy-namespace>/oracleidentitycloudservice/<your-oci-user-email-here>` (look for namespace in tenancy details on your OCI console for `<your-tenancy-namespace>`)
 
-`<OCIR-TOKEN>` -> the token we generated in previous step 6
+`<ocir-token>` -> the token we generated in previous step 6
 
 For `hello.yaml`, update:
 
-`<Region-Prefix-Name>` - eg: iad.ocir.io (for ashburn region)
+`<region-prefix-name>` - eg: iad.ocir.io (for ashburn region)
 
 `<your-tenancy-namespace>` -> (look for namespace in tenancy details on your OCI console for `<your-tenancy-namespace>`)
 
@@ -241,9 +247,16 @@ Once updated, lets copy these files into jenkins instance.
 
 From your local working directory where you have these files stored, copy the files into jenkins server using below commands.
 
-`scp -i <private-key-for-instance> <path-to-working-directory>/hello-deploy.sh opc@<public-ip-of-instance>:/var/lib/jenkins`
+`scp -i <path-to-ssh-private-key> hello-deploy.sh opc@<public-ip-of-jenkins-instance>:/home/opc`
 
-`scp -i <private-key-for-instance> <path-to-working-directory>/hello.yml opc@<public-ip-of-instance>:/var/lib/jenkins`
+`scp -i <path-to-ssh-private-key> hello.yml opc@<public-ip-of-jenkins-instance>:/home/opc`
+
+Now, login to your instance -> `ssh -i <path-to-ssh-private-key> opc@<public-ip-of-jenkins-instance>`
+
+Finally, copy both `hello-deploy.sh` and `hello.yml` to /var/lib/jenkins as:
+
+`sudo cp hello.yml /var/lib/jenkins`
+`sudo cp hello-deploy.sh /var/lib/jenkins`
 
 ## Step 8: Update Jenkinsfile in Github repo
 
@@ -255,15 +268,17 @@ In the `Jenkinsfile`, go to `stage('Push image to OCIR')` and update details rel
 
 `<username>` -> `<your-tenancy-namespace>/oracleidentitycloudservice/<your-oci-user-email-here>` (look for namespace in tenancy details on your OCI console for `<your-tenancy-namespace>`)
 
-`<OCIR-TOKEN>` -> the token we generated in previous step 6
+`<ocir-token>` -> the token we generated in previous step 6
 
-`<Region-Prefix-Name>` -> eg: iad.ocir.io (for ashburn region)
+`<region-prefix-name>` -> eg: iad.ocir.io (for ashburn region)
 
 `<your-tenancy-namespace>` -> (look for namespace in tenancy details on your OCI console for `<your-tenancy-namespace>`)
 
+Edit all the details and save the file.
+
 ## Step 9: Install Kubectl and configure kube-config on Jenkins
 
-ssh into Jenkins Server instance and install and verify kubectl using below single command.
+ssh into jenkins instance and install and verify kubectl using below single command.
 
 ````
 curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl;chmod +x ./kubectl;sudo mv ./kubectl /usr/local/bin/kubectl;kubectl version --client
@@ -273,7 +288,7 @@ Now, to setup kubeconfig, go to your OCI tenancy. On the left hand side click on
  
 Click on the cluster created by terraform earlier.
 
-On the top, click on `Access Kubeconfig` and run the commands specified (make sure you are inside the jenkins instance by ssh into it). 
+On the top, click on `Access Kubeconfig` and run the commands specified (make sure you are inside the jenkins instance to run the commands). 
 
 Once done, verify you can access the k8s nodes, by typing:
 
@@ -287,7 +302,7 @@ Finally, with all the configurations done, lets create the pipeline.
 
 On the Jenkins UI,(refer step 2 on how to access Jenkins UI), on the left hand side, you should see `Open Blue Ocean`. Click on it. It opens a new page.
 
-Select `New Pipeline`. Next select `Github`. If it asks for a token provide the Github token we generated in `step 4`. 
+Select `Create a new Pipeline`. Next select `GitHub`. If it asks for a token provide the Github token we generated in `step 4`. 
 
 Next, select your github profile. Search for the repo (`jenkins-helloworld`) you had forked and made the changes. 
 
