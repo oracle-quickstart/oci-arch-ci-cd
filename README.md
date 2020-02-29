@@ -53,7 +53,7 @@ Deploy:
 
 ## Post-Deployment Setup 
 
-### Step 1: Configure oci-cli and sudo user on Jenkins Instance
+### Step 1: Configure oci-cli and sudo user on jenkins instance
 
 Go to OCI console -> Compute -> Instances.
 
@@ -173,7 +173,7 @@ select `send me everything` for the field For `Which events would you like to tr
 
 Add webhook and you are done.
 
-## Step 4: Generate github token
+## Step 4: Generate Github token
 
 Now click on your github account profile, and click on Settings.
 
@@ -185,7 +185,7 @@ Enter a note, select all the options under `Select scopes` and click on `Generat
 
 This will generate a one time token. Copy and save it for future steps.
 
-## Step 5: Add the github token to Jenkins UI
+## Step 5: Add the Github token to Jenkins UI
 
 On the Jenkins UI, In Manage Jenkins option on the left , Click Configure System.
 
@@ -223,7 +223,7 @@ Click on `Generate Token`.
 
 Provide a discription and then hit `Generate Token`. This will generate a token. Make sure to copy the token for future steps.
 
-## Step 7: Update deployment files and copy to jenkins server
+## Step 7: Update deployment files and copy to jenkins instance
 
 In your local working directory, you should be able to see 2 files `hello-deploy.sh` and `hello.yaml` along with other terraform files.
 
@@ -276,7 +276,7 @@ In the `Jenkinsfile`, go to `stage('Push image to OCIR')` and update details rel
 
 Edit all the details and save the file.
 
-## Step 9: Install Kubectl and configure kube-config on Jenkins
+## Step 9: Install kubectl and configure kube-config on Jenkins
 
 ssh into jenkins instance and install and verify kubectl using below single command.
 
@@ -296,7 +296,7 @@ Once done, verify you can access the k8s nodes, by typing:
 
 You see details of the nodes running in the cluster. 
 
-## Step 10: Create a pipeline using Blue Ocean
+## Step 10: Create pipeline using Blue Ocean
 
 Finally, with all the configurations done, lets create the pipeline.
 
