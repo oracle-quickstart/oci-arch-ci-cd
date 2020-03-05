@@ -155,7 +155,7 @@ Click on Add.
 
 Finally, come down and make sure to click on `Save`
 
-## Step 3: Configure Github webhook
+### Step 3: Configure Github webhook
 
 Go to the repo https://github.com/KartikShrikantHegde/jenkins-helloworld. Fork it. 
 
@@ -169,11 +169,11 @@ For `Content type`, choose -> `application/json`
 
 Leave the secret field blank.
 
-select `send me everything` for the field For `Which events would you like to trigger this webhook`
+select `send me everything` for the field -> `Which events would you like to trigger this webhook`
 
 Add webhook and you are done.
 
-## Step 4: Generate Github token
+### Step 4: Generate Github token
 
 Now click on your github account profile, and click on Settings.
 
@@ -185,7 +185,7 @@ Enter a note, select all the options under `Select scopes` and click on `Generat
 
 This will generate a one time token. Copy and save it for future steps.
 
-## Step 5: Add the Github token to Jenkins UI
+### Step 5: Add the Github token to Jenkins UI
 
 On the Jenkins UI, In Manage Jenkins option on the left , Click Configure System.
 
@@ -213,7 +213,7 @@ Check right mark on the `Manage hooks`
 
 Go down to the bottom and make sure to click on `Save`.
 
-## Step 6: Generate OCIR token
+### Step 6: Generate OCIR token
 
 Login to OCI console.
 
@@ -223,7 +223,7 @@ Click on `Generate Token`.
 
 Provide a discription and then hit `Generate Token`. This will generate a token. Make sure to copy the token for future steps.
 
-## Step 7: Update deployment files and copy to jenkins instance
+### Step 7: Update deployment files and copy to jenkins instance
 
 In your local working directory, you should be able to see 2 files `hello-deploy.sh` and `hello.yaml` along with other terraform files.
 
@@ -256,9 +256,10 @@ Now, login to your instance -> `ssh -i <path-to-ssh-private-key> opc@<public-ip-
 Finally, copy both `hello-deploy.sh` and `hello.yml` to /var/lib/jenkins as:
 
 `sudo cp hello.yml /var/lib/jenkins`
+
 `sudo cp hello-deploy.sh /var/lib/jenkins`
 
-## Step 8: Update Jenkinsfile in Github repo
+### Step 8: Update Jenkinsfile in Github repo
 
 Go to the forked Github repo from https://github.com/KartikShrikantHegde/jenkins-helloworld.
 
@@ -268,7 +269,7 @@ In the `Jenkinsfile`, go to `stage('Push image to OCIR')` and update details rel
 
 `<username>` -> `<your-tenancy-namespace>/oracleidentitycloudservice/<your-oci-user-email-here>` (look for namespace in tenancy details on your OCI console for `<your-tenancy-namespace>`)
 
-`<ocir-token>` -> the token we generated in previous step 6
+`<ocir-token>` -> the token we generated in step 6
 
 `<region-prefix-name>` -> eg: iad.ocir.io (for ashburn region)
 
@@ -276,7 +277,7 @@ In the `Jenkinsfile`, go to `stage('Push image to OCIR')` and update details rel
 
 Edit all the details and save the file.
 
-## Step 9: Install kubectl and configure kube-config on Jenkins
+### Step 9: Install kubectl and configure kube-config on Jenkins
 
 ssh into jenkins instance and install and verify kubectl using below single command.
 
@@ -296,7 +297,7 @@ Once done, verify you can access the k8s nodes, by typing:
 
 You see details of the nodes running in the cluster. 
 
-## Step 10: Create pipeline using Blue Ocean
+### Step 10: Create pipeline using Blue Ocean
 
 Finally, with all the configurations done, lets create the pipeline.
 
