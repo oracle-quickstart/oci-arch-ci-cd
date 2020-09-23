@@ -51,7 +51,7 @@ resource "oci_core_instance" "TFJenkinsMaster" {
       private_key = chomp(file(var.ssh_private_key))
     }
 
-    content     = "${data.template_file.setup_jenkins.rendered}"
+    content     = data.template_file.setup_jenkins.rendered
     destination = "~/setup.sh"
   }
 
@@ -64,7 +64,7 @@ resource "oci_core_instance" "TFJenkinsMaster" {
       private_key = chomp(file(var.ssh_private_key))
     }
 
-    content     = "${data.template_file.init_jenkins.rendered}"
+    content     = data.template_file.init_jenkins.rendered
     destination = "~/default-user.groovy"
   }
 

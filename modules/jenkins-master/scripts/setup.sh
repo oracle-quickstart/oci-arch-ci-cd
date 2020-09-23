@@ -45,9 +45,11 @@ sudo echo "Installing jenkins"
 
 # Install Jenkins
 sudo echo "[jenkins-ci-org-${jenkins_version}]"
+
 sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
 sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
-sudo yum install -y jenkins-${jenkins_version}
+#sudo yum install -y jenkins-${jenkins_version}
+sudo yum install -y jenkins
 
 # Config Jenkins Http Port
 sudo sed -i '/JENKINS_PORT/c\ \JENKINS_PORT=\"${http_port}\"' /etc/sysconfig/jenkins
@@ -66,12 +68,13 @@ waitForJenkins
 # UPDATE PLUGIN LIST
 curl  -L http://updates.jenkins-ci.org/update-center.json | sed '1d;$d' | curl -X POST -H 'Accept: application/json' -d @- http://localhost:${http_port}/updateCenter/byId/default/postBack
 
-sleep 10
+sleep 30
 
 waitForJenkins
 
 # INSTALL CLI
-sudo cp /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar /var/lib/jenkins/jenkins-cli.jar
+#sudo cp /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar /var/lib/jenkins/jenkins-cli.jar
+sudo wget -P /var/lib/jenkins/ http://localhost:8080/jnlpJars/jenkins-cli.jar 
 
 sleep 10
 

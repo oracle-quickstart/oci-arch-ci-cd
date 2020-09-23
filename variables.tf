@@ -16,7 +16,8 @@ variable "jenkins_password" {
   default     = "Admin123"
 }
 variable "jenkins_version" {
-    default     = "2.204.2"
+#    default     = "2.204.2"
+  default    = "2.249.1"
 }
 variable "master_display_name" {
    default     = "jenkins-instance"
@@ -29,7 +30,7 @@ variable "http_port" {
   default     = 8080
 }
 variable "plugins" {  
-  type        = "list"
+  type        = list(string)
   description = "A list of Jenkins plugins to install, use short names. "
   default     = ["git", "ssh-slaves", "oracle-cloud-infrastructure-compute", "blueocean", "blueocean-github-pipeline"]
   }
@@ -42,5 +43,5 @@ variable "instance_os" {
 }
 variable "linux_os_version" {
   description = "Operating system version for all Linux instances"
-  default     = "7.7"
+  default     = "7.8"
 }

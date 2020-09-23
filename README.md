@@ -233,7 +233,7 @@ For `hello-deploy.sh`, update details for these fields:
 
 `<region-prefix-name>` -> eg: iad.ocir.io (for ashburn region)
 
-`<username>` -> `<your-tenancy-namespace>/oracleidentitycloudservice/<your-oci-user-email-here>` (look for namespace in tenancy details on your OCI console for `<your-tenancy-namespace>`)
+`<username>` -> `<your-tenancy-namespace>/identitycloudservice/<your-oci-user-email-here>` (look for namespace in tenancy details on your OCI console for `<your-tenancy-namespace>`)
 
 `<ocir-token>` -> the token we generated in previous step 6
 
@@ -267,7 +267,7 @@ Next, in the repo, you should be able to find `Jenkinsfile`. Let's update the `J
 
 In the `Jenkinsfile`, go to `stage('Push image to OCIR')` and update details related to your tenancy:
 
-`<username>` -> `<your-tenancy-namespace>/oracleidentitycloudservice/<your-oci-user-email-here>` (look for namespace in tenancy details on your OCI console for `<your-tenancy-namespace>`)
+`<username>` -> `<your-tenancy-namespace>/identitycloudservice/<your-oci-user-email-here>` (look for namespace in tenancy details on your OCI console for `<your-tenancy-namespace>`)
 
 `<ocir-token>` -> the token we generated in step 6
 

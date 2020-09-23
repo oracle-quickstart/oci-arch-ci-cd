@@ -6,10 +6,10 @@ variable "compartment_ocid" {}
 variable "tenancy_ocid" {}
 variable "vcn" {}
 variable "oke_cluster" {
-  type    = "map"
+  type    = map
   default = {
     name           = "OKE_Cluster"
-    k8s_version    = "v1.13.5"
+    k8s_version    = "v1.17.9"
     pool_name      = "Demo_Node_Pool"
     node_shape     = "VM.Standard2.1"
     pods_cidr      = "10.1.0.0/16"
