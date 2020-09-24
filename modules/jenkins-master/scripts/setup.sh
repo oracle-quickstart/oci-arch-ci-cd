@@ -49,7 +49,7 @@ sudo echo "[jenkins-ci-org-${jenkins_version}]"
 sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
 sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
 #sudo yum install -y jenkins-${jenkins_version}
-sudo yum install -y jenkins
+sudo yum install -y jenkins-${jenkins_version}
 
 # Config Jenkins Http Port
 sudo sed -i '/JENKINS_PORT/c\ \JENKINS_PORT=\"${http_port}\"' /etc/sysconfig/jenkins
