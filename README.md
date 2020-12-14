@@ -4,6 +4,8 @@ Quick delivery of software has become a competitive advantage for companies. The
 
 In this reference architecture, Jenkins is hosted on Oracle Cloud Infrastructure to centralize build automation and scale the deployment by using Oracle Cloud Infrastructure Registry and Container Engine for Kubernetes. GitHub is used to manage source code.
 
+For details of the architecture, see [Set up a CI/CD pipeline for cloud deployments](https://docs.oracle.com/en/solutions/cicd-pipeline/index.html)
+
 ## Terraform Provider for Oracle Cloud Infrastructure
 The OCI Terraform Provider is now available for automatic download through the Terraform Provider Registry. 
 For more information on how to get started view the [documentation](https://www.terraform.io/docs/providers/oci/index.html) 
