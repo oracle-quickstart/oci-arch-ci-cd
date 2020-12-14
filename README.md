@@ -335,8 +335,3 @@ When you no longer need the deployment, you can run this command to destroy it:
 ## CI/CD Architecture
 
 ![](./images/cicd-diagram.png)
-
-
-## Reference Archirecture
-
-- [Set up a CI/CD pipeline for cloud deployments](https://docs.oracle.com/en/solutions/cicd-pipeline/index.html)
