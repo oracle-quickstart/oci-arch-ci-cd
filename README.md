@@ -18,7 +18,7 @@ and [setup guide](https://www.terraform.io/docs/providers/oci/guides/version-3-u
 
 ## Deploy Using Oracle Resource Manager
 
-1. Click [![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)](https://console.us-phoenix-1.oraclecloud.com/resourcemanager/stacks/create?region=home&zipUrl=https://github.com/oracle-quickstart/oci-arch-web-ha/raw/master/resource-manager/oci-arch-web-ha.zip)
+1. Click [![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)](https://console.us-phoenix-1.oraclecloud.com/resourcemanager/stacks/create?region=home&zipUrl=https://github.com/oracle-quickstart/oci-arch-ci-cd/blob/master/resource-manager/oci-arch-ci-cd.zip)
 
     If you aren't already signed in, when prompted, enter the tenancy and user credentials.
 
