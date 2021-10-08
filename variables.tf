@@ -24,7 +24,7 @@ variable "master_display_name" {
 }
 variable "instance_shape" {
   description = "Instance Shape"
-  default     = "VM.Standard2.1"
+  default     = "VM.Standard.E4.Flex"
 }
 variable "http_port" {
   default     = 8080
@@ -43,5 +43,5 @@ variable "instance_os" {
 }
 variable "linux_os_version" {
   description = "Operating system version for all Linux instances"
-  default     = "7.8"
+  default     = "7.9"
 }
