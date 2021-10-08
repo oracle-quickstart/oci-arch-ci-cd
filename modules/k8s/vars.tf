@@ -16,8 +16,7 @@ variable "oke_cluster" {
     node_memory    = 4
     pods_cidr      = "10.1.0.0/16"
     services_cidr  = "10.2.0.0/16"
-    node_os        = "Oracle Linux"
-    node_os_version = "7.9"
+    node_linux_version = "7.9"
 
   }
 }

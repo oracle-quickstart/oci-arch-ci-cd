@@ -46,8 +46,8 @@ resource "oci_containerengine_node_pool" "test_node_pool" {
     #Required
     #image_id    = data.oci_containerengine_node_pool_option.test_node_pool_option.sources.0.image_id
     #source_type = data.oci_containerengine_node_pool_option.test_node_pool_option.sources.0.source_type
-    image_id = data.oci_core_images.alternative_node_image.images[0].id
-    source_type = "IMAGE"
+    image_id = element([for source in data.oci_containerengine_node_pool_option.test_node_pool_option.sources : source.source_name if length(regexall("Oracle-Linux-${var.oke_cluster["node_linux_version"]}-20[0-9]*.*", source.source_name)) > 0],0)
+    source_type = element([for source in data.oci_containerengine_node_pool_option.test_node_pool_option.sources : source.source_type if length(regexall("Oracle-Linux-${var.oke_cluster["node_linux_version"]}-20[0-9]*.*", source.source_name)) > 0],0)
   }
   
   ssh_public_key = chomp(file(var.ssh_public_key))
