@@ -9,11 +9,16 @@ variable "oke_cluster" {
   type    = map
   default = {
     name           = "OKE_Cluster"
-    k8s_version    = "v1.17.9"
+    k8s_version    = "v1.20.11"
     pool_name      = "Demo_Node_Pool"
-    node_shape     = "VM.Standard2.1"
+    node_shape     = "VM.Standard.E3.Flex"
+    node_ocpus     = 1
+    node_memory    = 4
     pods_cidr      = "10.1.0.0/16"
-    services_cidr = "10.2.0.0/16"
+    services_cidr  = "10.2.0.0/16"
+    node_os        = "Oracle Linux"
+    node_os_version = "7.9"
+
   }
 }
 variable "clustersub1_id" {}
@@ -32,5 +37,3 @@ variable "node_pool_initial_node_labels_value" {
 variable "ssh_public_key" {}
 
 variable "nodesub1_id" {}
-
-

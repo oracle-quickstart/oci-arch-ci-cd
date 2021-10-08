@@ -25,7 +25,7 @@ resource "oci_core_route_table" "rt" {
   vcn_id = oci_core_virtual_network.vcn.id
   display_name = "rt-table"
   route_rules {
-    cidr_block = "0.0.0.0/0"
+    destination = "0.0.0.0/0"
     network_entity_id = oci_core_internet_gateway.ig.id
   }
 }

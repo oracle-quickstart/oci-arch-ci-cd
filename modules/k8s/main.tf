@@ -44,8 +44,10 @@ resource "oci_containerengine_node_pool" "test_node_pool" {
 
   node_source_details {
     #Required
-    image_id    = data.oci_containerengine_node_pool_option.test_node_pool_option.sources.0.image_id
-    source_type = data.oci_containerengine_node_pool_option.test_node_pool_option.sources.0.source_type
+    #image_id    = data.oci_containerengine_node_pool_option.test_node_pool_option.sources.0.image_id
+    #source_type = data.oci_containerengine_node_pool_option.test_node_pool_option.sources.0.source_type
+    image_id = data.oci_core_images.alternative_node_image.images[0].id
+    source_type = "IMAGE"
   }
   
   ssh_public_key = chomp(file(var.ssh_public_key))
@@ -55,9 +57,18 @@ resource "oci_containerengine_node_pool" "test_node_pool" {
       availability_domain = lookup(data.oci_identity_availability_domains.ads.availability_domains[var.availability_domain - 2],"name")
       subnet_id           = var.nodesub1_id
     }
-
+    
     size = 3
   }
+
+  dynamic "node_shape_config" {
+    for_each = length(regexall("Flex", var.oke_cluster["node_shape"])) > 0 ? [1] : []
+    content {
+      ocpus         = var.oke_cluster["node_ocpus"]
+      memory_in_gbs = var.oke_cluster["node_memory"]
+    }
+  }
+
 }
 
 

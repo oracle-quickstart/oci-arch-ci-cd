@@ -16,3 +16,7 @@ variable "plugins" {}
 variable "instance_user" {}
 variable "instance_os" {}
 variable "linux_os_version" {}
+
+variable "flex_shape_ocpus" {}
+
+variable "flex_shape_memory" {}

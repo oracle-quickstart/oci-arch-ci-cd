@@ -18,6 +18,8 @@ module "jenkins-master" {
   compartment_ocid      = var.compartment_ocid
   master_display_name   = var.master_display_name
   instance_shape        = var.instance_shape
+  flex_shape_ocpus      = var.flex_shape_ocpus
+  flex_shape_memory     = var.flex_shape_memory
   instance_user         = var.instance_user
   subnet_id             = module.vcn.subnet1_ocid
   jenkins_version       = var.jenkins_version

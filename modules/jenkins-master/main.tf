@@ -21,6 +21,11 @@ data "template_file" "init_jenkins" {
   }
 }
 
+# Dictionary Locals
+locals {
+  is_flex_shape     = length(regexall("Flex", var.instance_shape)) > 0 ? true : false
+}
+
 ## JENKINS MASTER INSTANCE
 resource "oci_core_instance" "TFJenkinsMaster" {
   availability_domain = lookup(data.oci_identity_availability_domains.ads.availability_domains[var.availability_domain - 2],"name")
@@ -34,6 +39,14 @@ resource "oci_core_instance" "TFJenkinsMaster" {
 
    metadata = {
     ssh_authorized_keys = chomp(file(var.ssh_public_key))
+  }
+  
+  dynamic "shape_config" {
+    for_each = local.is_flex_shape ? [1] : []
+    content {
+      memory_in_gbs = var.flex_shape_memory
+      ocpus         = var.flex_shape_ocpus
+    }
   }
 
  source_details {
