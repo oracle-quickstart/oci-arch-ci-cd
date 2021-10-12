@@ -1,44 +1,45 @@
-## Copyright © 2020, Oracle and/or its affiliates. 
+## Copyright © 2021, Oracle and/or its affiliates. 
 ## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
 
-############################################
-# Jenkins Master Instance
-############################################
-
-module "vcn" {
-  source = "./modules/vcn"
-  tenancy_ocid          = var.tenancy_ocid
-  compartment_ocid      = var.compartment_ocid
+module "jenkins" {
+  source                       = "github.com/oracle-quickstart/oci-jenkins"
+  compartment_ocid             = var.compartment_ocid
+  jenkins_version              = var.jenkins_version
+  jenkins_password             = var.jenkins_password
+  controller_ad                = var.availablity_domain_name == "" ? data.oci_identity_availability_domains.ADs.availability_domains[var.availablity_domain_number]["name"] : var.availablity_domain_name
+  controller_subnet_id         = oci_core_subnet.my_jenkins_subnet.id
+  controller_image_id          = lookup(data.oci_core_images.jenkins_image.images[0], "id")
+  controller_shape             = var.jenkins_instance_shape
+  controller_flex_shape_ocpus  = var.flex_shape_ocpus
+  controller_flex_shape_memory = var.flex_shape_memory
+  controller_assign_public_ip  = true
+  controller_display_name      = "jenkinsvm"
+  plugins                      = var.plugins
+  agent_count                  = 0
+  ssh_authorized_keys          = var.ssh_public_key != "" ? var.ssh_public_key : tls_private_key.public_private_key_pair.public_key_openssh
+  ssh_private_key              = var.ssh_private_key != "" ? var.ssh_public_key : tls_private_key.public_private_key_pair.private_key_pem
+  http_port                    = var.jenkins_http_port
 }
 
-module "jenkins-master" {
-  source                = "./modules/jenkins-master"
-  tenancy_ocid          = var.tenancy_ocid
-  availability_domain   = var.availability_domain
-  compartment_ocid      = var.compartment_ocid
-  master_display_name   = var.master_display_name
-  instance_shape        = var.instance_shape
-  flex_shape_ocpus      = var.flex_shape_ocpus
-  flex_shape_memory     = var.flex_shape_memory
-  instance_user         = var.instance_user
-  subnet_id             = module.vcn.subnet1_ocid
-  jenkins_version       = var.jenkins_version
-  jenkins_password      = var.jenkins_password
-  http_port             = var.http_port
-  ssh_public_key        = var.ssh_public_key
-  ssh_private_key       = var.ssh_private_key
-  plugins               = var.plugins
-  instance_os           = var.instance_os
-  linux_os_version      = var.linux_os_version
-}
 
-module "k8s" {
-  source                = "./modules/k8s"
-  tenancy_ocid          = var.tenancy_ocid
-  compartment_ocid      = var.compartment_ocid
-  vcn                   = module.vcn.vcn_id
-  clustersub1_id        = module.vcn.subnet1_ocid
-  nodesub1_id           = module.vcn.subnet2_ocid
-  ssh_public_key        = var.ssh_public_key
-  availability_domain   = var.availability_domain
-} 
+module "oci-oke" {
+  source                        = "github.com/oracle-quickstart/oci-oke"
+  tenancy_ocid                  = var.tenancy_ocid
+  compartment_ocid              = var.compartment_ocid
+  oke_cluster_name              = var.oke_cluster_name
+  node_shape                    = var.oke_node_shape
+  node_ocpus                    = var.oke_node_ocpus
+  node_memory                   = var.oke_node_memory
+  node_count                    = var.oke_node_count
+  k8s_version                   = var.oke_k8s_version
+  use_existing_vcn              = true
+  vcn_id                        = oci_core_vcn.my_vcn.id
+  is_api_endpoint_subnet_public = false
+  api_endpoint_subnet_id        = oci_core_subnet.my_api_endpoint_subnet.id
+  is_lb_subnet_public           = true
+  lb_subnet_id                  = oci_core_subnet.my_lb_subnet.id
+  is_nodepool_subnet_public     = false
+  nodepool_subnet_id            = oci_core_subnet.my_nodepool_subnet.id
+  ssh_public_key                = var.ssh_public_key != "" ? var.ssh_public_key : tls_private_key.public_private_key_pair.public_key_openssh
+  availability_domain           = var.availablity_domain_name == "" ? data.oci_identity_availability_domains.ADs.availability_domains[var.availablity_domain_number]["name"] : var.availablity_domain_name
+}

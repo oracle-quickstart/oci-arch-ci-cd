@@ -1,0 +1,377 @@
+# Copyright (c) 2021, Oracle and/or its affiliates. All rights reserved.
+# Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
+
+title: "Set up a Jenkins CI/CD pipeline for cloud deployments in OKE"
+description: "Set up a Jenkins CI/CD pipeline for cloud deployments in Container Engine for Kubernetes (OKE)."
+schemaVersion: 1.1.0
+version: "20201028"
+locale: "en"
+
+variableGroups:
+- title: "General Configuration"
+  visible: false
+  variables:
+  - tenancy_ocid
+  - region
+  - release
+  - instance_user
+  - ssh_private_key
+  - availablity_domain_number
+
+- title: "Required Configuration"
+  visible: true  
+  variables:
+  - compartment_ocid
+  - availablity_domain_name 
+  - jenkins_password
+  - show_advanced
+
+- title: "Networking Optional Configuration"
+  visible: 
+      and:
+        - show_advanced
+  variables:
+  - vcn_cidr
+  - nodepool_subnet_cidr
+  - lb_subnet_cidr
+  - api_endpoint_subnet_cidr
+  - jenkins_subnet_cidr
+  - jenkins_http_port
+  - jenkins_jnlp_port
+
+- title: "Jenkins Optional Configuration"
+  visible: 
+      and:
+        - show_advanced
+  variables:
+  - ssh_public_key
+  - instance_os
+  - linux_os_version
+  - jenkins_instance_shape
+  - flex_shape_ocpus
+  - flex_shape_memory
+  - jenkins_version
+  - plugins
+
+- title: "OKE Optional Configuration"
+  visible: 
+      and:
+        - show_advanced
+  variables:
+  - oke_cluster_name
+  - oke_node_count
+  - oke_k8s_version
+  - oke_node_shape
+  - oke_node_ocpus
+  - oke_node_memory
+
+variables:
+
+  show_advanced:
+    type: boolean
+    title: "Show advanced options?"
+    description: "Shows advanced options."
+    visible: true
+    default: false
+
+  # General Configuration
+  tenancy_ocid:
+    title: "Tenancy ID"
+    description: "The Oracle Cloud Identifier (OCID) for your tenancy"
+    type: string
+    required: true
+    visibile: false
+
+  region:
+    title: "Region"
+    description: "Region where you deploy your Jenkins"
+    type: oci:identity:region:name
+    required: true
+    visibile: true
+
+  compartment_ocid:
+    title: "Compartment OCID"
+    description: "Comparment where you deploy your Jenkins"
+    type: oci:identity:compartment:id
+    required: true
+    visibile: true
+
+  ssh_public_key:
+    type: oci:core:ssh:publickey
+    title: "Public SSH Key"
+    description: "Choose public SSH Key to be uploaded into compute instances."
+    required: false
+
+  availablity_domain_name:
+    type: oci:identity:availabilitydomain:name
+    required: true
+    visibile: true
+    title: "Availability Domain to be chosen"
+    description: "Choose Availability Domain where your Bastion will be deployed."
+    dependsOn:
+      regionName: ${region}
+      compartmentId: ${compartment_ocid}
+
+  jenkins_password:
+    type: password
+    default: ""
+    required: true
+    title: "Jenkins admin user password"
+    description: "Enter password for Jenkins admin user"
+
+  # Optional Configuration
+
+  plugins:
+    type: array
+    items:
+      type: string
+      pattern: "^[a-zA-Z0-9\\-]+$"
+    required: true
+    title: "Jenkins Plugins"
+    default: ["git", "ssh-slaves", "oracle-cloud-infrastructure-compute", "blueocean", "blueocean-github-pipeline"]
+    minItems: 1
+    uniqueItems: true
+    description: "Define Jenkins plugins to be installed (minimum 1 plugin)."
+
+  vcn_cidr:
+    type: string
+    required: false
+    default: "192.168.0.0/16"
+    pattern: "^(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\/(3[0-2]|[1-2]?[0-9])$"
+    title: "VCN CIDR"
+    description: "A single, contiguous IPv4 CIDR block of your choice for the VCN"
+  
+  nodepool_subnet_cidr:
+    type: string
+    required: false
+    default: "192.168.1.0/24"
+    pattern: "^(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\/(3[0-2]|[1-2]?[0-9])$"
+    title: "OKE NodePool Subnet CIDR"
+    description: "A single, contiguous IPv4 CIDR block of your choice for the VCN"
+
+  lb_subnet_cidr:
+    type: string
+    required: false
+    default: "192.168.2.0/24"
+    pattern: "^(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\/(3[0-2]|[1-2]?[0-9])$"
+    title: "OKE LoadBalancer Subnet CIDR"
+    description: "A single, contiguous IPv4 CIDR block of your choice for the VCN"
+
+  api_endpoint_subnet_cidr:
+    type: string
+    required: false
+    default: "192.168.3.0/24"
+    pattern: "^(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\/(3[0-2]|[1-2]?[0-9])$"
+    title: "OKE API EndPoint Subnet CIDR"
+    description: "A single, contiguous IPv4 CIDR block of your choice for the VCN"
+
+  jenkins_subnet_cidr:
+    type: string
+    required: false
+    default: "192.168.4.0/24"
+    pattern: "^(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]).(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\/(3[0-2]|[1-2]?[0-9])$"
+    title: "Jenkins Subnet CIDR"
+    description: "A single, contiguous IPv4 CIDR block of your choice for the VCN"
+
+  jenkins_http_port:
+    title: "HTTP Port"
+    description: "HTTP Port for Jenkins Server"
+    default: 8080
+    minimum: 1
+    maximum: 65535
+    multipleOf: 1
+    type: number
+    required: false
+  
+  jenkins_jnlp_port:
+    title: "JNLP Port"
+    description: "JNLP Port for Jenkins Server"
+    default: 49187
+    minimum: 1
+    maximum: 65535
+    multipleOf: 1
+    type: number
+    required: false
+
+  jenkins_version:
+    title: "Jenkins version"
+    description: "Jenkins software version"
+    default: "2.277.4"
+    type: enum
+    enum: 
+      - "2.277.4"
+    required: false
+
+  instance_os:
+    type: enum
+    required: false
+    visible: false
+    title: "Instance OS"
+    description: "An Operating System that determines the operating system for Jenkins host."
+    default: "Oracle Linux"
+    enum:
+      - "Oracle Linux"
+
+  linux_os_version:
+    type: enum
+    required: false
+    visible: false
+    title: "Instance OS version"
+    description: "An Operating System version that determines the operating system version for Jenkins host."
+    default: "7.9"
+    enum:
+      - "7.9" 
+
+  jenkins_instance_shape:
+    type: oci:core:instanceshape:name
+    title: "Jenkins Server Shape"
+    description: "Jenkins Server Shape"
+    default: "VM.Standard.E3.Flex"
+    required: false
+    dependsOn:
+      compartmentId: ${compartment_ocid}
+
+  flex_shape_ocpus:
+    visible:
+      or:
+        - eq:
+          - jenkins_instance_shape
+          - "VM.Standard.E3.Flex"
+        - eq:
+          - jenkins_instance_shape
+          - "VM.Standard.E4.Flex"
+        - eq:
+          - jenkins_instance_shape
+          - "VM.Optimized3.Flex"
+        - eq:
+          - jenkins_instance_shape
+          - "VM.Standard.A1.Flex" 
+    type: integer
+    default: 1
+    title: Jenkins Server Flex Shape OCPUs
+    minimum: 1
+    maximum: 64
+    required: false
+    description: Maximum of 64 OCPUs
+  
+  flex_shape_memory:
+    visible:
+      or:
+        - eq:
+          - jenkins_instance_shape
+          - "VM.Standard.E3.Flex"
+        - eq:
+          - jenkins_instance_shape
+          - "VM.Standard.E4.Flex"
+        - eq:
+          - jenkins_instance_shape
+          - "VM.Optimized3.Flex" 
+        - eq:
+          - jenkins_instance_shape
+          - "VM.Standard.A1.Flex" 
+    type: integer
+    default: 16
+    title: Jenkins Server Flex Shape Memory 
+    minimum: 1
+    maximum: 1024
+    required: false
+    description: Minimum 1GB or 6GB. Maximum of 64GB per OCPU up to 1024GB
+
+  oke_cluster_name:
+    type: string
+    required: false
+    default: "OKECluster4CICD"
+    title: "OKE Cluster Name"
+    description: "Define what will be the name of OKE Cluster."
+
+  oke_k8s_version:
+    type: enum
+    required: false
+    title: "OKE K8S Version"
+    description: "Decide which version of K8S you will deploy within OKE Cluster."
+    default: "v1.20.11"
+    enum:
+      - "v1.20.11"
+      - "v1.20.8"
+      - "v1.19.15"
+      - "v1.19.12"
+      - "v1.19.7"
+      - "v1.18.10"
+
+  oke_node_count:
+    title: "OKE Node count"
+    description: "Decide how many nodes will be deployed within OKE NodePool."
+    default: 3
+    minimum: 3
+    maximum: 255
+    multipleOf: 1
+    type: number
+    required: false
+
+  oke_node_shape:
+    type: oci:core:instanceshape:name
+    title: "OKE Nodes Shape"
+    description: "OKE Nodes Shape"
+    default: "VM.Standard.E3.Flex"
+    required: false
+    dependsOn:
+      compartmentId: ${compartment_ocid}
+
+  oke_node_ocpus:
+    visible:
+      or:
+        - eq:
+          - oke_node_shape
+          - "VM.Standard.E3.Flex"
+        - eq:
+          - oke_node_shape
+          - "VM.Standard.E4.Flex"
+    type: integer
+    default: 1
+    title: OKE Nodes Flex Shape OCPUs
+    minimum: 1
+    maximum: 64
+    required: false
+    description: Maximum of 64 OCPUs
+
+  oke_node_memory:
+    visible:
+      or:
+        - eq:
+          - oke_node_shape
+          - "VM.Standard.E3.Flex"
+        - eq:
+          - oke_node_shape
+          - "VM.Standard.E4.Flex" 
+    type: integer
+    default: 16
+    title: OKE Nodes Flex Flex Shape Memory 
+    minimum: 1
+    maximum: 1024
+    required: false
+    description: Minimum 1GB or 6GB. Maximum of 64GB per OCPU up to 1024GB
+
+  release:
+    type: string
+    required: false
+    visible: false
+    title: "Reference Architecture Release (OCI Architecture Center)"
+
+outputs:
+
+  jenkins_login_url:
+    title: "Jenkins Login URL"
+    displayText: "Jenkins Login URL"
+    type: copyableString
+    visible: true
+  
+  jenkins_public_ip:
+    title: "Jenkins Public IP"
+    displayText: "Jenkins Public IP"
+    type: copyableString
+    visible: true
+
+
+
+ 
+
