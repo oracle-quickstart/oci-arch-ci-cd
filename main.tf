@@ -40,6 +40,6 @@ module "oci-oke" {
   lb_subnet_id                  = oci_core_subnet.my_lb_subnet.id
   is_nodepool_subnet_public     = false
   nodepool_subnet_id            = oci_core_subnet.my_nodepool_subnet.id
-  ssh_public_key                = var.ssh_public_key != "" ? var.ssh_public_key : tls_private_key.public_private_key_pair.public_key_openssh
+  ssh_public_key                = tls_private_key.public_private_key_pair.public_key_openssh
   availability_domain           = var.availability_domain_name == "" ? data.oci_identity_availability_domains.ADs.availability_domains[var.availability_domain_number]["name"] : var.availability_domain_name
 }
