@@ -11,7 +11,6 @@
 *.tfstate.*
 *.zip*
 *.tfvars
-.terraform.lock.hcl
 
 # Icon must end with two \r
 Icon
@@ -35,8 +34,11 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+# terraform lock file
+**/.terraform.lock.hcl
+
 # ignore common security keys
-.key
-.crt
-.csr
-.pem
+*.key
+*.crt
+*.csr
+*.pem
