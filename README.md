@@ -75,13 +75,16 @@ Deploy:
 
 ## Post-Deployment Setup 
 
-### Step 1: Retrieve SSH keys
+### Step 1: Retrieve the auto-generated SSH keys
 
-**If using Resource Manager**
-Within the Stack, go to Jobs -> open the 'Apply' job -> Outputs -> generated_ssh_private_key -> click 'Unlock'   
+**1.1. If using Resource Manager**
 
-**If using OCI CLI**  
-Run:
+Within the Stack, go to Jobs -> open the 'Apply' job -> Outputs -> generated_ssh_private_key -> click 'Unlock'  
+WARNING: the displayed key is not ideally formatted. Here is a [sample tool](https://www.samltool.com/format_privatekey.php) which will quickly format the key for you.
+
+**1.2 If using OCI CLI**, run:
+
+
     terraform console
     nonsensitive(tls_private_key.public_private_key_pair.private_key_pem)
 
