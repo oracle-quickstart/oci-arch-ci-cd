@@ -8,3 +8,8 @@ output "jenkins_public_ip" {
 output "jenkins_login_url" {
   value = "http://${module.jenkins.controller_public_ip}:${var.jenkins_http_port}"
 }
+
+output "generated_ssh_private_key" {
+  value     = tls_private_key.public_private_key_pair.private_key_pem
+  sensitive = true
+}

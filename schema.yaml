@@ -15,14 +15,13 @@ variableGroups:
   - region
   - release
   - instance_user
-  - ssh_private_key
-  - availablity_domain_number
+  - availability_domain_number
 
 - title: "Required Configuration"
   visible: true  
   variables:
   - compartment_ocid
-  - availablity_domain_name 
+  - availability_domain_name 
   - jenkins_password
   - show_advanced
 
@@ -44,7 +43,6 @@ variableGroups:
       and:
         - show_advanced
   variables:
-  - ssh_public_key
   - instance_os
   - linux_os_version
   - jenkins_instance_shape
@@ -96,13 +94,7 @@ variables:
     required: true
     visibile: true
 
-  ssh_public_key:
-    type: oci:core:ssh:publickey
-    title: "Public SSH Key"
-    description: "Choose public SSH Key to be uploaded into compute instances."
-    required: false
-
-  availablity_domain_name:
+  availability_domain_name:
     type: oci:identity:availabilitydomain:name
     required: true
     visibile: true

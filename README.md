@@ -58,16 +58,13 @@ user_ocid            = "<user_ocid>"
 fingerprint          = "<finger_print>"
 private_key_path     = "<pem_private_key_path>"
 
-# SSH Keys
-ssh_public_key  = "<public_ssh_key_content>"
-
 # Region
 region = "<oci_region>"
 
 # Compartment
 compartment_ocid = "<compartment_ocid>"
 
-````
+```
 
 Deploy:
 
@@ -78,7 +75,20 @@ Deploy:
 
 ## Post-Deployment Setup 
 
-### Step 1: Configure oci-cli and sudo user on jenkins instance
+### Step 1: Retrieve the auto-generated SSH keys
+
+**1.1. If using Resource Manager**
+
+Within the Stack, go to Jobs -> open the 'Apply' job -> Outputs -> generated_ssh_private_key -> click 'Unlock'  
+WARNING: the displayed key is not ideally formatted. Here is a [sample tool](https://www.samltool.com/format_privatekey.php) which will quickly format the key for you.
+
+**1.2 If using OCI CLI**, run:
+
+
+    terraform console
+    nonsensitive(tls_private_key.public_private_key_pair.private_key_pem)
+
+### Step 2: Configure oci-cli and sudo user on jenkins instance
 
 Go to OCI console -> Compute -> Instances.
 

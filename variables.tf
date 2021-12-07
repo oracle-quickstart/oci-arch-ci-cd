@@ -11,7 +11,7 @@ variable "region" {}
 
 variable "release" {
   description = "Reference Architecture Release (OCI Architecture Center)"
-  default     = "1.0"
+  default     = "1.0.1"
 }
 
 variable "vcn_cidr" {
@@ -66,18 +66,11 @@ variable "oke_k8s_version" {
   default = "v1.20.11"
 }
 
-variable "availablity_domain_name" {
+variable "availability_domain_name" {
   default = ""
 }
-variable "availablity_domain_number" {
+variable "availability_domain_number" {
   default = 0
-}
-
-variable "ssh_public_key" {
-  default = ""
-}
-variable "ssh_private_key" {
-  default = ""
 }
 
 variable "jenkins_password" {
